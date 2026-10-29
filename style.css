@@ -107,7 +107,10 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   margin-top: var(--space-4); border-radius: 12px; overflow: hidden;
   border: 1px solid var(--border);
 }
-.exam-title { background: var(--surface-2); padding: var(--space-2) var(--space-4); font-weight: 600; }
+.exam-title {
+  background: var(--danger-soft); color: var(--danger);
+  padding: var(--space-2) var(--space-4); font-size: 20px; font-weight: 700;
+}
 .exam-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
 .exam-grid > div { padding: var(--space-4); border-top: 1px solid var(--border); }
 .exam-grid > div + div { border-left: 1px solid var(--border); }
