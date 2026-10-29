@@ -130,6 +130,35 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .alert.error { background: var(--danger-soft); color: var(--danger); }
 .alert.ok { background: var(--success-soft); color: var(--success); }
 
+/* Green page theme (student page): green backdrop, white cards, white header text */
+body.theme-green {
+  --primary: #15803d;
+  --primary-soft: #dcfce7;
+  --page-bg: linear-gradient(180deg, #0d5c2e 0%, #15803d 55%, #1f9a50 100%);
+  --on-page: #ffffff;
+  --on-page-muted: #d6f5e0;
+  --gold: #ffd84d;
+  background: #15803d var(--page-bg) fixed;
+}
+@media (prefers-color-scheme: dark) {
+  body.theme-green {
+    --primary: #4ade80;
+    --primary-ink: #052e16;
+    --primary-soft: #14532d;
+    --page-bg: linear-gradient(180deg, #052e16 0%, #0b4424 100%);
+    background: #052e16 var(--page-bg) fixed;
+  }
+}
+.theme-green header.site h1 { color: var(--on-page); white-space: pre-line; font-size: clamp(28px, 8vw, 40px); }
+.theme-green header.site p { color: var(--on-page-muted); }
+.theme-green header.site .venue { color: var(--on-page); font-size: clamp(18px, 5vw, 22px); font-weight: 600; }
+.theme-green header.site .date {
+  display: inline-block; margin: var(--space-3) 0; padding: 4px 18px; border-radius: 999px;
+  background: var(--gold); color: #3d2e00; font-size: clamp(18px, 5vw, 22px); font-weight: 700;
+}
+.theme-green header.site .date[hidden] { display: none; }
+.theme-green footer.site, .theme-green footer.site a { color: var(--on-page-muted); }
+
 footer.site { text-align: center; color: var(--muted); font-size: 14px; margin-top: var(--space-6); }
 footer.site a { color: var(--muted); }
 

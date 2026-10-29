@@ -11,11 +11,12 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="theme-green">
   <main class="wrap">
     <header class="site">
-      <span class="badge" id="subtitle">ประกาศห้องสอบ</span>
       <h1 id="title">ค้นหาห้องสอบและที่นั่งสอบ</h1>
+      <p class="venue" id="subtitle"></p>
+      <p class="date" id="examDate" hidden></p>
       <p>กรอกเลขประจำตัวนักเรียนเพื่อดูห้องสอบของตนเอง</p>
     </header>
 
@@ -48,8 +49,9 @@
       result.innerHTML = '<div class="alert error">ยังไม่มีข้อมูลห้องสอบ กรุณาให้ครูอัปโหลดข้อมูลผ่านหน้าผู้ดูแล</div>';
       form.querySelector('button').disabled = true;
     } else {
-      if (data.meta?.title) { document.getElementById('title').textContent = data.meta.title; document.title = data.meta.title; }
+      if (data.meta?.title) { document.getElementById('title').textContent = data.meta.title; document.title = data.meta.title.replace(/\n/g, ' '); }
       if (data.meta?.subtitle) document.getElementById('subtitle').textContent = data.meta.subtitle;
+      if (data.meta?.date) { const d = document.getElementById('examDate'); d.textContent = data.meta.date; d.hidden = false; }
       if (data.meta?.updated) document.getElementById('updated').textContent = 'ข้อมูล ณ ' + data.meta.updated;
     }
 
