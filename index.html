@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ค้นหาห้องสอบและที่นั่งสอบ</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="กรอกเลขประจำตัวนักเรียนเพื่อดูห้องสอบ เลขที่นั่งสอบ และสถานที่สอบ">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="wrap">
+    <header class="site">
+      <span class="badge" id="subtitle">ประกาศห้องสอบ</span>
+      <h1 id="title">ค้นหาห้องสอบและที่นั่งสอบ</h1>
+      <p>กรอกเลขประจำตัวนักเรียนเพื่อดูห้องสอบของตนเอง</p>
+    </header>
+
+    <form class="card no-print" id="searchForm" novalidate>
+      <label class="field" for="sid">เลขประจำตัวนักเรียน</label>
+      <div class="search-row">
+        <input type="text" id="sid" name="sid" inputmode="numeric" autocomplete="off"
+               placeholder="เช่น 12345" aria-describedby="sidHint" required>
+        <button type="submit" id="searchBtn">ค้นหา</button>
+      </div>
+      <p class="hint" id="sidHint">พิมพ์ตัวเลขไทยหรืออารบิกก็ได้</p>
+    </form>
+
+    <div class="result" id="result" aria-live="polite"></div>
+
+    <footer class="site">
+      <span id="updated"></span>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+  <script src="data.js"></script>
+  <script>
+    const form = document.getElementById('searchForm');
+    const input = document.getElementById('sid');
+    const result = document.getElementById('result');
+    const data = window.EXAM_DATA;
+
+    if (!data || !data.students) {
+      result.innerHTML = '<div class="alert error">ยังไม่มีข้อมูลห้องสอบ กรุณาให้ครูอัปโหลดข้อมูลผ่านหน้าผู้ดูแล</div>';
+      form.querySelector('button').disabled = true;
+    } else {
+      if (data.meta?.title) { document.getElementById('title').textContent = data.meta.title; document.title = data.meta.title; }
+      if (data.meta?.subtitle) document.getElementById('subtitle').textContent = data.meta.subtitle;
+      if (data.meta?.updated) document.getElementById('updated').textContent = 'ข้อมูล ณ ' + data.meta.updated;
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      if (!data) return;
+      const raw = input.value.trim();
+      if (!raw) {
+        result.innerHTML = '<div class="alert warn" role="alert">กรุณากรอกเลขประจำตัวนักเรียน</div>';
+        input.focus();
+        return;
+      }
+      const s = findStudent(data, raw);
+      result.innerHTML = s
+        ? renderStudent(s)
+        : `<div class="alert error" role="alert">ไม่พบเลขประจำตัว <b>${escapeHtml(raw)}</b> ในบัญชีผู้เข้าสอบ กรุณาตรวจสอบเลขอีกครั้ง หรือติดต่อครูผู้รับผิดชอบ</div>`;
+    });
+  </script>
+</body>
+</html>
