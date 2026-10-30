@@ -32,6 +32,11 @@
 
     <div class="result" id="result" aria-live="polite"></div>
 
+    <section class="card summary" id="summary" aria-labelledby="summaryTitle" hidden>
+      <h2 id="summaryTitle">จำนวนผู้เข้าสอบ</h2>
+      <div class="summary-grid" id="summaryGrid"></div>
+    </section>
+
     <footer class="site">
       <span id="updated"></span>
     </footer>
@@ -53,6 +58,19 @@
       if (data.meta?.subtitle) document.getElementById('subtitle').textContent = data.meta.subtitle;
       if (data.meta?.date) { const d = document.getElementById('examDate'); d.textContent = data.meta.date; d.hidden = false; }
       if (data.meta?.updated) document.getElementById('updated').textContent = 'ข้อมูล ณ ' + data.meta.updated;
+
+      // Head count per exam level (e.title), in first-seen order, plus the total
+      const counts = new Map();
+      for (const s of Object.values(data.students))
+        for (const e of s.exams) if (e.title) counts.set(e.title, (counts.get(e.title) || 0) + 1);
+      if (counts.size) {
+        const total = [...counts.values()].reduce((a, b) => a + b, 0);
+        const fmt = n => n.toLocaleString('th-TH');
+        document.getElementById('summaryGrid').innerHTML =
+          [...counts].map(([t, n]) => `<div class="sum-item"><div class="l">${escapeHtml(t.replace('ธรรมศึกษา', ''))}</div><div class="n">${fmt(n)}</div><div class="u">คน</div></div>`).join('') +
+          `<div class="sum-item total"><div class="l">รวมทั้งหมด</div><div class="n">${fmt(total)}</div><div class="u">คน</div></div>`;
+        document.getElementById('summary').hidden = false;
+      }
     }
 
     form.addEventListener('submit', e => {

@@ -159,6 +159,22 @@ body.theme-green {
 .theme-green header.site .date[hidden] { display: none; }
 .theme-green footer.site, .theme-green footer.site a { color: var(--on-page-muted); }
 
+/* Head-count summary under the search */
+.summary { margin-top: var(--space-5); }
+.summary[hidden] { display: none; }
+.summary h2 { margin: 0 0 var(--space-3); font-size: 18px; }
+.summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); }
+.sum-item { background: var(--surface-2); border-radius: 12px; padding: var(--space-3) var(--space-2); text-align: center; }
+.sum-item .l { color: var(--danger); font-weight: 700; }
+.sum-item .n { font-size: clamp(22px, 6vw, 28px); font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.sum-item .u { color: var(--muted); font-size: 14px; }
+.sum-item.total { background: var(--primary); color: var(--primary-ink); }
+.sum-item.total .l, .sum-item.total .u { color: inherit; }
+@media (max-width: 400px) {
+  .summary-grid { grid-template-columns: repeat(3, 1fr); }
+  .sum-item.total { grid-column: 1 / -1; }
+}
+
 footer.site { text-align: center; color: var(--muted); font-size: 14px; margin-top: var(--space-6); }
 footer.site a { color: var(--muted); }
 
