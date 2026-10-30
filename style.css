@@ -175,6 +175,17 @@ body.theme-green {
   .sum-item.total { grid-column: 1 / -1; }
 }
 
+.by-grade-title { margin: var(--space-5) 0 var(--space-2); font-size: 16px; }
+.by-grade-wrap { overflow-x: auto; }
+.by-grade { font-size: 16px; font-variant-numeric: tabular-nums; }
+.by-grade th, .by-grade td { padding: 8px 6px; text-align: center; white-space: nowrap; }
+.by-grade thead th { color: var(--muted); }
+.by-grade tbody th { text-align: left; color: var(--danger); font-weight: 700; }
+.by-grade tfoot th { text-align: left; }
+.by-grade tfoot th, .by-grade tfoot td, .by-grade .sum { font-weight: 700; }
+.by-grade tfoot td, .by-grade tfoot th { border-top: 2px solid var(--border); border-bottom: 0; }
+.by-grade .sum { color: var(--primary); }
+
 footer.site { text-align: center; color: var(--muted); font-size: 14px; margin-top: var(--space-6); }
 footer.site a { color: var(--muted); }
 

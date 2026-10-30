@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261030d">
+  <link rel="stylesheet" href="style.css?v=20261030e">
 </head>
 <body class="theme-green">
   <main class="wrap">
@@ -35,6 +35,8 @@
     <section class="card summary" id="summary" aria-labelledby="summaryTitle" hidden>
       <h2 id="summaryTitle">จำนวนผู้เข้าสอบ</h2>
       <div class="summary-grid" id="summaryGrid"></div>
+      <h3 class="by-grade-title">แยกตามระดับชั้นเรียน</h3>
+      <div class="by-grade-wrap"><table class="by-grade" id="byGrade"></table></div>
     </section>
 
     <footer class="site">
@@ -42,8 +44,8 @@
     </footer>
   </main>
 
-  <script src="app.js?v=20261030d"></script>
-  <script src="data.js?v=20261030d"></script>
+  <script src="app.js?v=20261030e"></script>
+  <script src="data.js?v=20261030e"></script>
   <script>
     const form = document.getElementById('searchForm');
     const input = document.getElementById('sid');
@@ -69,6 +71,27 @@
         document.getElementById('summaryGrid').innerHTML =
           [...counts].map(([t, n]) => `<div class="sum-item"><div class="l">${escapeHtml(t.replace('ธรรมศึกษา', ''))}</div><div class="n">${fmt(n)}</div><div class="u">คน</div></div>`).join('') +
           `<div class="sum-item total"><div class="l">รวมทั้งหมด</div><div class="n">${fmt(total)}</div><div class="u">คน</div></div>`;
+
+        // Level × grade table: grade = "ม.4" part of the class "ม.4/6"
+        const grid = new Map(), grades = new Set();
+        for (const s of Object.values(data.students)) {
+          const g = (s.cls || '').split('/')[0] || 'ไม่ระบุ';
+          for (const e of s.exams) {
+            if (!e.title) continue;
+            grades.add(g);
+            const row = grid.get(e.title) || grid.set(e.title, new Map()).get(e.title);
+            row.set(g, (row.get(g) || 0) + 1);
+          }
+        }
+        const cols = [...grades].sort((a, b) => a.localeCompare(b, 'th', { numeric: true }));
+        const colTotal = g => [...grid.values()].reduce((a, r) => a + (r.get(g) || 0), 0);
+        document.getElementById('byGrade').innerHTML = `
+          <thead><tr><th scope="col">ระดับ</th>${cols.map(g => `<th scope="col">${escapeHtml(g)}</th>`).join('')}<th scope="col">รวม</th></tr></thead>
+          <tbody>${[...counts.keys()].map(t => {
+            const r = grid.get(t);
+            return `<tr><th scope="row">${escapeHtml(t.replace('ธรรมศึกษา', ''))}</th>${cols.map(g => `<td>${fmt(r.get(g) || 0)}</td>`).join('')}<td class="sum">${fmt(counts.get(t))}</td></tr>`;
+          }).join('')}</tbody>
+          <tfoot><tr><th scope="row">รวม</th>${cols.map(g => `<td>${fmt(colTotal(g))}</td>`).join('')}<td class="sum">${fmt(total)}</td></tr></tfoot>`;
         document.getElementById('summary').hidden = false;
       }
     }
