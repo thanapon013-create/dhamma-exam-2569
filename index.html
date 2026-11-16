@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261030e">
+  <link rel="stylesheet" href="style.css?v=20261116a">
 </head>
 <body class="theme-green">
   <main class="wrap">
@@ -32,6 +32,13 @@
 
     <div class="result" id="result" aria-live="polite"></div>
 
+    <section class="card rooms" id="rooms" aria-labelledby="roomsTitle" hidden>
+      <h2 id="roomsTitle">ดูรายชื่อแต่ละห้องสอบ</h2>
+      <div class="level-tabs no-print" id="levelTabs" role="group" aria-label="เลือกระดับ"></div>
+      <div class="room-buttons no-print" id="roomButtons" role="group" aria-label="เลือกห้องสอบ"></div>
+      <div id="roomList" aria-live="polite"></div>
+    </section>
+
     <section class="card summary" id="summary" aria-labelledby="summaryTitle" hidden>
       <h2 id="summaryTitle">จำนวนผู้เข้าสอบ</h2>
       <div class="summary-grid" id="summaryGrid"></div>
@@ -44,8 +51,8 @@
     </footer>
   </main>
 
-  <script src="app.js?v=20261030e"></script>
-  <script src="data.js?v=20261030e"></script>
+  <script src="app.js?v=20261116a"></script>
+  <script src="data.js?v=20261116a"></script>
   <script>
     const form = document.getElementById('searchForm');
     const input = document.getElementById('sid');
@@ -110,6 +117,61 @@
         ? renderStudent(s)
         : `<div class="alert error" role="alert">ไม่พบเลขประจำตัว <b>${escapeHtml(raw)}</b> ในบัญชีผู้เข้าสอบ กรุณาตรวจสอบเลขอีกครั้ง หรือติดต่อครูผู้รับผิดชอบ</div>`;
     });
+
+    // ---------- Room browser: pick a level, then an exam room, to see everyone in it ----------
+    if (data && data.students) {
+      const levels = new Map(); // title -> Map(room -> {loc, people: []})
+      for (const s of Object.values(data.students)) {
+        for (const e of s.exams) {
+          if (!e.title) continue;
+          const rooms = levels.get(e.title) || levels.set(e.title, new Map()).get(e.title);
+          const r = rooms.get(e.room) || rooms.set(e.room, { loc: e.loc, people: [] }).get(e.room);
+          r.people.push({ seat: e.seat, name: s.name, cls: s.cls });
+        }
+      }
+      const byNum = (a, b) => a.localeCompare(b, 'th', { numeric: true });
+      const short = t => t.replace('ธรรมศึกษา', '');
+      const tabs = document.getElementById('levelTabs');
+      const btns = document.getElementById('roomButtons');
+      const list = document.getElementById('roomList');
+
+      function showLevel(title) {
+        tabs.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.level === title));
+        const rooms = [...levels.get(title)].sort((a, b) => byNum(a[0], b[0]));
+        btns.innerHTML = rooms.map(([room, r]) => `
+          <button type="button" class="room-btn" data-room="${escapeHtml(room)}" aria-pressed="false">
+            <span class="rn">ห้องสอบ ${escapeHtml(room)}</span>
+            <span class="rl">${escapeHtml(r.loc || '-')} · ${r.people.length} คน</span>
+          </button>`).join('');
+        btns.querySelectorAll('button').forEach(b => b.addEventListener('click', () => showRoom(title, b.dataset.room)));
+        list.innerHTML = '<p class="hint">เลือกห้องสอบเพื่อดูรายชื่อทั้งห้อง</p>';
+      }
+
+      function showRoom(title, room) {
+        btns.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.room === room));
+        const r = levels.get(title).get(room);
+        const people = [...r.people].sort((a, b) => byNum(a.seat, b.seat));
+        list.innerHTML = `
+          <div class="room-head">
+            <div><span class="lv">${escapeHtml(short(title))}</span> ห้องสอบที่ ${escapeHtml(room)}</div>
+            <div class="loc">${escapeHtml(r.loc || '-')} · ${people.length} คน</div>
+          </div>
+          <div class="table-wrap"><table class="room-table">
+            <thead><tr><th>ที่</th><th>เลขที่สอบ</th><th>ชื่อ - นามสกุล</th><th>ห้อง</th></tr></thead>
+            <tbody>${people.map((p, i) => `<tr><td>${i + 1}</td><td>${escapeHtml(p.seat)}</td><td class="nm">${escapeHtml(p.name)}</td><td>${escapeHtml(p.cls)}</td></tr>`).join('')}</tbody>
+          </table></div>
+          <button type="button" class="secondary no-print print-btn" onclick="window.print()">พิมพ์รายชื่อห้องนี้</button>`;
+        list.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      if (levels.size) {
+        tabs.innerHTML = [...levels.keys()].map(t =>
+          `<button type="button" class="level-tab" data-level="${escapeHtml(t)}" aria-pressed="false">${escapeHtml(short(t))}</button>`).join('');
+        tabs.querySelectorAll('button').forEach(b => b.addEventListener('click', () => showLevel(b.dataset.level)));
+        showLevel([...levels.keys()][0]);
+        document.getElementById('rooms').hidden = false;
+      }
+    }
   </script>
 </body>
 </html>

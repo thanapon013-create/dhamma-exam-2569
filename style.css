@@ -186,6 +186,35 @@ body.theme-green {
 .by-grade tfoot td, .by-grade tfoot th { border-top: 2px solid var(--border); border-bottom: 0; }
 .by-grade .sum { color: var(--primary); }
 
+/* Room browser */
+.rooms { margin-top: var(--space-5); }
+.rooms[hidden] { display: none; }
+.rooms h2 { margin: 0 0 var(--space-3); font-size: 18px; }
+.level-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); }
+.level-tab { background: var(--surface-2); color: var(--danger); border-color: var(--border); }
+.level-tab[aria-pressed="true"] { background: var(--danger); color: #fff; border-color: var(--danger); }
+.room-buttons { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: var(--space-2); margin-top: var(--space-3); }
+.room-btn {
+  flex-direction: column; gap: 0; padding: 8px 6px; line-height: 1.3;
+  background: var(--surface); color: var(--text); border-color: var(--border);
+}
+.room-btn .rn { font-weight: 700; }
+.room-btn .rl { font-size: 13px; font-weight: 500; color: var(--muted); }
+.room-btn[aria-pressed="true"] { background: var(--primary); color: var(--primary-ink); border-color: var(--primary); }
+.room-btn[aria-pressed="true"] .rl { color: inherit; }
+#roomList { margin-top: var(--space-4); scroll-margin-top: var(--space-4); }
+.room-head {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-2);
+  align-items: baseline; font-size: 18px; font-weight: 700;
+}
+.room-head .lv { color: var(--danger); }
+.room-head .loc { color: var(--primary); }
+.room-table { font-size: 14px; }
+.room-table td, .room-table th { padding: 6px 4px; }
+.room-table td:first-child, .room-table th:first-child { text-align: center; color: var(--muted); }
+.room-table td.nm { white-space: normal; }
+.print-btn { margin-top: var(--space-3); }
+
 footer.site { text-align: center; color: var(--muted); font-size: 14px; margin-top: var(--space-6); }
 footer.site a { color: var(--muted); }
 
@@ -224,6 +253,9 @@ th { color: var(--muted); font-weight: 600; }
 
 @media print {
   body { background: #fff; }
-  .no-print { display: none !important; }
+  .no-print, #result, #summary, footer.site { display: none !important; }
+  .theme-green { background: #fff !important; }
+  .theme-green header.site h1, .theme-green header.site .venue, .theme-green header.site p { color: #000 !important; }
+  .rooms h2 { display: none; }
   .card { box-shadow: none; }
 }
